@@ -1,0 +1,23 @@
+.source-list {
+  list-style: none; /* Remove default list style */
+  padding: 0;
+}
+
+.source-list li a {
+  display: flex;
+  align-items: center;
+  color: inherit;
+}
+
+.paragraph {
+  display: flex;
+  align-items: center;
+}
+
+.icon {
+  margin-right: 5px;
+}
+
+.card-header {
+  margin-bottom: 15px;
+}

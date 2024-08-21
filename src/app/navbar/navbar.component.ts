@@ -9,6 +9,8 @@ import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
+import { getSessionId } from '../../lib/getUserId';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-navbar',
@@ -22,10 +24,16 @@ import { map, shareReplay } from 'rxjs/operators';
     MatListModule,
     MatIconModule,
     AsyncPipe,
+    RouterModule,
   ],
 })
 export class NavbarComponent {
   private breakpointObserver = inject(BreakpointObserver);
+  sessionId!: string;
+
+  ngOnInit(): void {
+    this.sessionId = getSessionId();
+  }
 
   isHandset$: Observable<boolean> = this.breakpointObserver
     .observe(Breakpoints.Handset)

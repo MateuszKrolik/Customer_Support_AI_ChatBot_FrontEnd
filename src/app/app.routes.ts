@@ -1,7 +1,8 @@
 import { Routes } from '@angular/router';
-import { AppComponent } from './app.component';
-import { QueryDetailsPageComponent } from './query-details-page/query-details-page.component';
 import { QueryFormComponent } from './query-form/query-form.component';
+import { UserQueriesTableComponent } from './user-queries-table/user-queries-table.component';
+import { QueryComponent } from './query/query.component';
+import { NotFoundComponent } from './not-found/not-found.component';
 
 export const routes: Routes = [
   {
@@ -9,7 +10,17 @@ export const routes: Routes = [
     component: QueryFormComponent,
   },
   {
-    path: 'query-details',
-    component: QueryDetailsPageComponent,
+    path: 'get-queries',
+    component: UserQueriesTableComponent,
+    children: [
+      {
+        path: ':queryId',
+        component: QueryComponent,
+      },
+    ],
+  },
+  {
+    path: '**',
+    component: NotFoundComponent,
   },
 ];

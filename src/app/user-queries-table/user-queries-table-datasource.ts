@@ -1,51 +1,63 @@
+// src/app/user-queries-table/user-queries-table.component.ts
 import { DataSource } from '@angular/cdk/collections';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { map } from 'rxjs/operators';
-import { Observable, of as observableOf, merge } from 'rxjs';
+import { Observable, of as observableOf, merge, BehaviorSubject } from 'rxjs';
+import { DefaultService, QueryModel } from '../../api-client';
+import { DestroyRef, inject, Injectable } from '@angular/core';
+import { getSessionId } from '../../lib/getUserId';
 
 // TODO: Replace this with your own data model type
 export interface UserQueriesTableItem {
-  name: string;
-  id: number;
+  query_id: string;
+  query_text: string;
 }
-
-// TODO: replace this with real data from your application
-const EXAMPLE_DATA: UserQueriesTableItem[] = [
-  {id: 1, name: 'Hydrogen'},
-  {id: 2, name: 'Helium'},
-  {id: 3, name: 'Lithium'},
-  {id: 4, name: 'Beryllium'},
-  {id: 5, name: 'Boron'},
-  {id: 6, name: 'Carbon'},
-  {id: 7, name: 'Nitrogen'},
-  {id: 8, name: 'Oxygen'},
-  {id: 9, name: 'Fluorine'},
-  {id: 10, name: 'Neon'},
-  {id: 11, name: 'Sodium'},
-  {id: 12, name: 'Magnesium'},
-  {id: 13, name: 'Aluminum'},
-  {id: 14, name: 'Silicon'},
-  {id: 15, name: 'Phosphorus'},
-  {id: 16, name: 'Sulfur'},
-  {id: 17, name: 'Chlorine'},
-  {id: 18, name: 'Argon'},
-  {id: 19, name: 'Potassium'},
-  {id: 20, name: 'Calcium'},
-];
 
 /**
  * Data source for the UserQueriesTable view. This class should
  * encapsulate all logic for fetching and manipulating the displayed data
  * (including sorting, pagination, and filtering).
  */
+
+@Injectable({
+  providedIn: 'root',
+})
 export class UserQueriesTableDataSource extends DataSource<UserQueriesTableItem> {
-  data: UserQueriesTableItem[] = EXAMPLE_DATA;
+  private dataSubject = new BehaviorSubject<UserQueriesTableItem[]>([]);
+  data: UserQueriesTableItem[] = [];
   paginator: MatPaginator | undefined;
   sort: MatSort | undefined;
 
-  constructor() {
+  private destroyRef = inject(DestroyRef);
+
+  constructor(private defaultService: DefaultService) {
     super();
+    this.getQueriesDataByUserIdFromApi();
+  }
+
+  getQueriesDataByUserIdFromApi(): void {
+    const userId = getSessionId();
+    const subscription = this.defaultService
+      .getQueriesByUserIdGetQueriesGet(userId)
+      .subscribe({
+        next: (resData: QueryModel[]) => {
+          this.data = resData.map((query) => ({
+            query_id: query.query_id || '',
+            query_text: query.query_text || '',
+          }));
+          console.log('Data fetched:', this.data);
+          this.dataSubject.next(this.data);
+        },
+        error: (error) => {
+          console.error(error);
+        },
+      });
+
+    // Unsubscribe when the component is destroyed
+    this.destroyRef.onDestroy(() => {
+      subscription.unsubscribe();
+    });
   }
 
   /**
@@ -57,12 +69,17 @@ export class UserQueriesTableDataSource extends DataSource<UserQueriesTableItem>
     if (this.paginator && this.sort) {
       // Combine everything that affects the rendered data into one update
       // stream for the data-table to consume.
-      return merge(observableOf(this.data), this.paginator.page, this.sort.sortChange)
-        .pipe(map(() => {
-          return this.getPagedData(this.getSortedData([...this.data ]));
-        }));
+      return merge(
+        this.dataSubject.asObservable(),
+        this.paginator.page,
+        this.sort.sortChange
+      ).pipe(
+        map(() => {
+          return this.getPagedData(this.getSortedData([...this.data]));
+        })
+      );
     } else {
-      throw Error('Please set the paginator and sort on the data source before connecting.');
+      return observableOf(this.data);
     }
   }
 
@@ -97,15 +114,20 @@ export class UserQueriesTableDataSource extends DataSource<UserQueriesTableItem>
     return data.sort((a, b) => {
       const isAsc = this.sort?.direction === 'asc';
       switch (this.sort?.active) {
-        case 'name': return compare(a.name, b.name, isAsc);
-        case 'id': return compare(+a.id, +b.id, isAsc);
-        default: return 0;
+        case 'query_text':
+          return compare(a.query_text, b.query_text, isAsc);
+        default:
+          return 0;
       }
     });
   }
 }
 
 /** Simple sort comparator for example ID/Name columns (for client-side sorting). */
-function compare(a: string | number, b: string | number, isAsc: boolean): number {
+function compare(
+  a: string | number,
+  b: string | number,
+  isAsc: boolean
+): number {
   return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
 }

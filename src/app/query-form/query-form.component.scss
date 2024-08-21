@@ -25,3 +25,42 @@
 .col:last-child {
   margin-right: 0;
 }
+
+header {
+  margin: 2rem 0;
+  text-align: center;
+}
+
+header h1 {
+  font-family: "Quicksand", sans-serif;
+  font-weight: 700;
+  font-size: 3rem;
+  margin: 1rem 0;
+  letter-spacing: 0.2rem;
+}
+
+header img {
+  width: 5rem;
+  height: 5rem;
+  object-fit: contain;
+  border-radius: 50%;
+  border: 2px solid #8e1794;
+  filter: drop-shadow(0 0 4px rgba(31, 42, 42, 0.5));
+}
+
+.centered-link-container {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+}
+
+.centered-link {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  align-items: center;
+}
+
+.centered-link-icon {
+  margin-right: 5px;
+}

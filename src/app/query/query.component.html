@@ -1,0 +1,53 @@
+<ng-container>
+  @if (query()) {
+  <mat-card>
+    <mat-card-header class="card-header">
+      <mat-card-title>
+        <strong>Query ID:</strong>
+        {{ query()?.query_id }}
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <p class="paragraph">
+        <mat-icon class="icon">person</mat-icon> {{ query()?.user_id }}
+      </p>
+      <p class="paragraph">
+        <mat-icon class="icon">calendar_month</mat-icon>
+        {{ query()?.created_at_unix_timestamp! * 1000 | date : "medium" }}
+      </p>
+      <p class="paragraph">
+        <mat-icon class="icon">timer</mat-icon>
+        {{ query()?.time_to_live_unix_timestamp! * 1000 | date : "medium" }}
+      </p>
+      <p class="paragraph">
+        <mat-icon class="icon">live_help</mat-icon> {{ query()?.query_text }}
+      </p>
+      <p>
+        <strong>Response: </strong>
+        {{ query()?.response_text }}
+      </p>
+      <p><strong>Sources:</strong></p>
+      <ul class="source-list">
+        @for (source of query()?.sources; track source) {
+        <li>
+          <a
+            href="https://github.com/MateuszKrolik/Customer_Support_AI_ChatBot_BackEnd/blob/master/app/src/data/source/stellar_web_solutions_customer_handbook.pdf"
+            target="_blank"
+            class="source-link"
+          >
+            <mat-icon>link</mat-icon>
+            {{ source }}
+          </a>
+        </li>
+        }
+      </ul>
+    </mat-card-content>
+  </mat-card>
+  } @else {
+  <mat-card>
+    <mat-card-content>
+      <mat-spinner></mat-spinner>
+    </mat-card-content>
+  </mat-card>
+  }
+</ng-container>

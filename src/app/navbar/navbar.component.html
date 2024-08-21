@@ -10,9 +10,7 @@
   >
     <mat-toolbar>Menu</mat-toolbar>
     <mat-nav-list>
-      <a mat-list-item href="#">Link 1</a>
-      <a mat-list-item href="#">Link 2</a>
-      <a mat-list-item href="#">Link 3</a>
+      <a mat-list-item [routerLink]="['/get-queries']">Your Queries</a>
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content>
@@ -29,12 +27,15 @@
       }
       <button
         mat-mini-fab
-        disabled
         aria-label="Example icon button with a home icon"
+        [routerLink]="['/']"
       >
         <mat-icon>home</mat-icon>
       </button>
-      <span>Customer_Support_AI_ChatBot_FrontEnd</span>
+      <span class="title">Stellar Web Solutions</span>
+      <span class="spacer"></span>
+      <mat-icon class="person-icon">person</mat-icon>
+      <span> {{ sessionId }}</span>
     </mat-toolbar>
     <!-- Add Content Here -->
     <ng-content></ng-content>
